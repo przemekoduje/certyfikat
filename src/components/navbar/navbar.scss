@@ -53,6 +53,14 @@
             border: none;
             background-color: #FF0083;
             border-radius: 5px;
+            box-shadow: 0 4px 7px rgba(0, 0, 0, 0.3); /* Dodany cień */
+            transition: box-shadow 0.3s ease; /* Płynne przejście dla cienia */
+            cursor: pointer;
+
+            &:hover {
+                box-shadow: 0 6px 9px #0000004d; /* Cień po najechaniu myszą */
+            }
+
 
         }
     }
