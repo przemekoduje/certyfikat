@@ -10,9 +10,9 @@ export default function Navbar() {
         <div className="logo">
           <img src="/images/logo_image.png" alt="" />
         </div>
-        <div className="logoText">
-          <span>Greenspan</span>
-        </div>
+        {/* <div className="logoText">
+          <span>[ Greenspan ]</span>
+        </div> */}
       </div>
       <div className="linkArea">
         <a href="/">Q & A</a>
