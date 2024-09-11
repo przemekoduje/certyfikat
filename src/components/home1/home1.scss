@@ -1,11 +1,9 @@
 .home1-container {
     width: 100%;
-    height: calc(100vh - 80px);
+    // height: calc(100vh - 80px);
+    height: 100vh;
     position: relative;
-    top: 80px;
-
-
-
+    // top: 80px;
 
     .background {
         width: 100%;
@@ -25,7 +23,7 @@
 
     .textButton {
         position: absolute;
-        top: 60px;
+        top: 140px;
         left: 155px;
         max-width: 670px;
         display: flex;

@@ -2,6 +2,35 @@ import React, { useEffect, useRef } from "react";
 import "./home2.scss";
 import Comix from "../comix/Comix";
 
+
+const images = [
+  "/images/Tło usunięte (scene1).png",
+  "/images/Tło usunięte (scene2).png",
+  "/images/Tło usunięte (scene3).png",
+  "/images/Tło usunięte (scene4).png",
+  "/images/Tło usunięte (scene5).png",
+  "/images/Tło usunięte (scene6).png",
+];
+
+const head = [
+  "Czy Twój dom jest energooszczędny? ",
+  "Pierwszy krok do oszczędności.",
+  "Zoptymalizuj swój dom.",
+  "Komfort i oszczędność.",
+  "Świadectwo to krok ku lepszemu środowisku.",
+  "Świadectwo to inwestycja w naturę.",
+];
+
+const opis = [
+  "Świadectwo charakterystyki energetycznej pomaga odpowiedzieć na to pytanie.",
+  "Z pomocą specjalisty możesz dowiedzieć się, jak poprawić efektywność energetyczną swojego domu.",
+  "Świadectwo energetyczne wskazuje, gdzie Twój dom może zaoszczędzić energię – od izolacji po lepsze okna.",
+  "Lepsza efektywność energetyczna to niższe rachunki, większy komfort życia i przyjazność dla natury.",
+  "Dzięki świadectwom energetycznym zmniejszamy nasz ślad węglowy i dbamy o przyszłość planety.",
+  "Z każdym świadectwem sadzimy drzewa, wspólnie tworząc zdrowszą przyszłość dla nas wszystkich.",
+];
+
+
 export default function Home2() {
   const comixContainerRef1 = useRef(null);
   const comixContainerRef2 = useRef(null);
@@ -58,26 +87,37 @@ export default function Home2() {
 
   return (
     <div className="home2-container">
-      {/* Heading */}
       <div className="display">
         <h1>Na co komu ten cały kłopot?</h1>
       </div>
 
-      {/* Comix 1-3 */}
-      <div ref={comixContainerRef1} className="comix-container">
-        <div className="comix-item">
-            <Comix/>
+      <span className="info_h2 lato-regular">Świadectwo charakterystyki energetycznej to nie zbędna formalność, ale klucz do oszczędności i wyższej wartości Twojej nieruchomości. Dzięki niemu wiesz, gdzie Twój dom traci energię i jakie kroki podjąć, by to zmienić – od poprawy izolacji po wymianę okien. Lepsza efektywność energetyczna to nie tylko niższe rachunki, ale i wyższa wartość rynkowa budynku. Inwestycja w świadectwo to pierwszy krok do poprawy komfortu życia, zwiększenia atrakcyjności nieruchomości na rynku oraz wsparcia dla środowiska, bo każdy z nas może działać na rzecz redukcji emisji CO₂.</span>
+
+      <div className="images-cont_h2">
+        <div ref={comixContainerRef1} className="comix-container cont1">
+          {images.slice(0, 3).map((img, index) => (
+            <div className="comix-item" key={index}>
+              <Comix
+                image={img}
+                head={head[index]}
+                opis={opis[index]}
+              />
+            </div>
+          ))}
         </div>
-        <div className="comix-item">Comix 2</div>
-        <div className="comix-item">Comix 3</div>
+        <div ref={comixContainerRef2} className="comix-container cont2">
+          {images.slice(3, 6).map((img, index) => (
+            <div className="comix-item" key={index + 3}>
+              <Comix
+                image={img}
+                head={head[index + 3]}
+                opis={opis[index + 3]}
+              />
+            </div>
+          ))}
+        </div>
       </div>
 
-      {/* Comix 4-6 */}
-      <div ref={comixContainerRef2} className="comix-container">
-        <div className="comix-item">Comix 4</div>
-        <div className="comix-item">Comix 5</div>
-        <div className="comix-item">Comix 6</div>
-      </div>
     </div>
   );
 }

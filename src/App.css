@@ -5,7 +5,9 @@
   justify-content: center;
 
   .container{
-    width: 1440px;
+    position: relative;
+   width: 1440px;
+    margin: 0 auto;
   }
 
 }

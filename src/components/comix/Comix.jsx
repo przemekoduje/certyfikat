@@ -1,15 +1,15 @@
 import React from 'react'
 import './comix.scss'
 
-export default function Comix() {
+export default function Comix({ image, head, opis }) {
   return (
     <div className='comix'>
         <div className="image">
-            <img src="/images/Tło usunięte (scene1).png" alt="" />
+            <img src={image} alt="" />
         </div>
         <div className="texts">
-            <h3>Czy Twój dom jest energooszczędny</h3>
-            <span>Świadectwo charakterystyki energetycznej pomaga odpowiedzieć na to pytanie.</span>
+            <h3 className='merriweather-regular'>{head}</h3>
+            <span className='lato-regular'>{opis}</span>
         </div>
         
     </div>

@@ -1,94 +1,109 @@
-.navbar{
+.navbar-wrapper {
+    width: 100%;
     position: fixed;
-    width: 1440px;
-    height: 80px;
-    // border-bottom: 1px solid #4a4a4a;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    z-index: 1000;
     top: 0;
-    background-color: white;
-    box-shadow: 0 4px 12px -8px rgba(0, 0, 0, 0.1); /* Cień tylko pod dolną krawędzią */
-   
-    
+    left: 0;
+    right: 0;
+    z-index: 1000;
 
-    .logoArea{
-        display: flex;
-        align-items: flex-end;
-        gap: 55px;
-        padding-left: 40px;
-
-
-        .logo{
-            width: 60px;
-            height: 60px;
-            // border-radius: 50%;
-            // border: 1px solid #4a4a4a;
-
-            img{
-                width: 100%;
-                height: 100%;
-            }
-        }
-        .logoText{
-            font-size: 28px;
-            
-
-            span{
-                font-family: "Amethysta", serif;
-                color: #4a4a4a;
-
-            }
-        }
-    }
-    .linkArea{
-        font-family: "Lato", serif;
+    .navbar {
+        width: 1440px;
+        height: 80px;
+        margin: 0 auto;
         display: flex;
         align-items: center;
-        gap: 30px;
-        padding-right: 40px;
+        justify-content: space-between;
+        background-color: white;
+        box-shadow: 0 4px 12px -8px rgba(0, 0, 0, 0.1);
 
-        a{
-            color: black;
-            text-decoration: none;
-        }
 
-        button{
-            font-size: 14px;
-            color: white;
-            padding: 12px 24px;
-            border: none;
-            background-color: #FF0083;
-            border-radius: 5px;
-            box-shadow: 0 4px 7px rgba(0, 0, 0, 0.3); /* Dodany cień */
-            transition: box-shadow 0.3s ease; /* Płynne przejście dla cienia */
-            cursor: pointer;
+        .logoArea {
+            display: flex;
+            align-items: flex-end;
+            gap: 55px;
+            padding-left: 40px;
+            margin-right: auto;
 
-            &:hover {
-                box-shadow: 0 6px 9px #0000004d; /* Cień po najechaniu myszą */
+
+            .logo {
+                width: 60px;
+                height: 60px;
+                // border-radius: 50%;
+                // border: 1px solid #4a4a4a;
+
+                img {
+                    width: 100%;
+                    height: 100%;
+                }
             }
 
+            .logoText {
+                font-size: 28px;
+
+
+                span {
+                    font-family: "Amethysta", serif;
+                    color: #4a4a4a;
+
+                }
+            }
         }
-    }
-    .hamburger{
-        display: none;
-        padding-right: 40px;
+
+        .linkArea {
+            font-family: "Lato", serif;
+            display: flex;
+            align-items: center;
+            gap: 30px;
+            padding-right: 40px;
+
+            a {
+                color: black;
+                text-decoration: none;
+            }
+
+            button {
+                font-size: 14px;
+                color: white;
+                padding: 12px 24px;
+                border: none;
+                background-color: #FF0083;
+                border-radius: 5px;
+                box-shadow: 0 4px 7px rgba(0, 0, 0, 0.3);
+                /* Dodany cień */
+                transition: box-shadow 0.3s ease;
+                /* Płynne przejście dla cienia */
+                cursor: pointer;
+
+                &:hover {
+                    box-shadow: 0 6px 9px #0000004d;
+                    /* Cień po najechaniu myszą */
+                }
+
+            }
+        }
+
+        .hamburger {
+            display: none;
+            padding-right: 40px;
+
+        }
+
 
     }
 
 
 }
 
+
 /* Media query for screens smaller than 740px */
 @media (min-width: 1440px) {
-    .navbar .logoArea{
+    .navbar-wrapper .navbar .logoArea {
         padding-left: 0;
         gap: 95px;
-        
+
     }
-    
-    .navbar .linkArea{
+
+    .navbar-wrapper .navbar .linkArea {
         padding-right: 0;
 
     }
@@ -97,16 +112,17 @@
 
 
 @media (max-width: 740px) {
-    .navbar .logoArea .logoText {
+    .navbar-wrapper .navbar .logoArea .logoText {
         display: none;
     }
 }
 
 @media (max-width: 450px) {
-    .navbar .linkArea {
+    .navbar-wrapper .navbar .linkArea {
         display: none;
     }
-    .navbar .hamburger{
+
+    .navbar-wrapper .navbar .hamburger {
         display: block;
 
     }
