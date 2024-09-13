@@ -4,10 +4,12 @@ import "./home2.scss";
 
 // Karty z obrazami
 const cards = [
-  { id: 1, imageUrl: "/images/Tło usunięte (scene1).png" },
-  { id: 2, imageUrl: "/images/Tło usunięte (scene2).png" },
-  { id: 3, imageUrl: "/images/Tło usunięte (scene3).png" },
-  { id: 4, imageUrl: "/images/Tło usunięte (scene4).png" },
+  { id: 1, imageUrl: "/images/Tło usunięte (scene1).png", h3: "Czy Twój dom jest energooszczędny?", p: "Świadectwo charakterystyki energetycznej pomaga odpowiedzieć na to pytanie." },
+  { id: 2, imageUrl: "/images/Tło usunięte (scene2).png", h3: "Pierwszy krok do oszczędności.", p: "Z pomocą specjalisty możesz dowiedzieć się, jak poprawić efektywność energetyczną swojego domu." },
+  { id: 3, imageUrl: "/images/Tło usunięte (scene3).png", h3: "Zoptymalizuj swój dom.", p: "Świadectwo energetyczne wskazuje, gdzie Twój dom może zaoszczędzić energię – od izolacji po lepsze okna." },
+  { id: 4, imageUrl: "/images/Tło usunięte (scene4).png", h3: "Komfort i oszczędność.", p: "Lepsza efektywność energetyczna to niższe rachunki, większy komfort życia i przyjazność dla natury." },
+  { id: 5, imageUrl: "/images/Tło usunięte (scene5).png", h3: "Świadectwo to krok ku lepszemu środowisku.", p: "Dzięki świadectwom energetycznym zmniejszamy nasz ślad węglowy i dbamy o przyszłość planety." },
+  { id: 6, imageUrl: "/images/Tło usunięte (scene6).png", h3: "Świadectwo to inwestycja w naturę.", p: "Z każdym świadectwem sadzimy drzewa, wspólnie tworząc zdrowszą przyszłość dla nas wszystkich." },
 ];
 
 export default function Home2() {
@@ -55,47 +57,51 @@ export default function Home2() {
     const offset = distance * 50; // Stała wartość dla przesunięcia
     const scale = 1 - distance * 0.07; // Stała wartość dla zmniejszania skali
 
-    if (index === currentIndex) {
-      return {
-        zIndex: zIndexes[index],
-      };
-    } else if (index < currentIndex) {
-      return {
-        zIndex: zIndexes[index],
-      };
-    } else {
-      return {
-        zIndex: zIndexes[index],
-      };
+    return {
+      zIndex: zIndexes[index],
+    };
+  };
+
+  // Dodajemy obsługę przeciągania
+  const handleDragEnd = (event, info) => {
+    if (info.offset.x > 45) {
+      handleSwipe("left"); // Swipe w prawo
+    } else if (info.offset.x < -45) {
+      handleSwipe("right"); // Swipe w lewo
     }
   };
 
   return (
     <div className="home2-container">
+      <h1 className="lato-regular">Na co Ci ten kłopot?</h1>
       <div className="card-swipe-container">
         {cards.map((card, index) => (
           <motion.div
             key={card.id}
-            className={`card ${
-              index === currentIndex
-                ? "active"
-                : index < currentIndex
+            className={`card ${index === currentIndex
+              ? "active"
+              : index < currentIndex
                 ? "left"
                 : "card-stack"
-            }`}
+              }`}
             style={getCardStyle(index)}
-            
+
             // Dodajemy animacje
             animate={{
-              x: index === currentIndex 
-                ? 0 
-                : index < currentIndex 
-                ? -35 - (Math.abs(currentIndex - index) * 50) // Przesuwanie na lewo
-                : 35 + (Math.abs(currentIndex - index) * 50), // Przesuwanie na prawo
-              scale: index === currentIndex 
-                ? 1 
+              x: index === currentIndex
+                ? 0
+                : index < currentIndex
+                  ? -35 - (Math.abs(currentIndex - index) * 50) // Przesuwanie na lewo
+                  : 35 + (Math.abs(currentIndex - index) * 50), // Przesuwanie na prawo
+              scale: index === currentIndex
+                ? 1
                 : 1 - (Math.abs(currentIndex - index) * 0.07), // Skala
             }}
+
+            // Dodajemy przeciąganie
+            drag="x"
+            dragConstraints={{ left: 0, right: 0 }} // Ograniczamy przeciąganie w poziomie
+            onDragEnd={handleDragEnd} // Obsługa przeciągnięcia karty
 
             // Definiujemy animację przejścia
             transition={{
@@ -103,14 +109,28 @@ export default function Home2() {
               stiffness: 300, // Im wyższa wartość, tym szybciej karta wróci na miejsce
               damping: 30, // Kontroluje "drgania" przy animacji
             }}
+
+            // Obsługa kliknięcia na kartę poniżej
+            onClick={() => {
+              if (index !== currentIndex) {
+                setCurrentIndex(index); // Zmień aktywną kartę na tę klikniętą
+                handleSwipe("right")
+              }
+            }}
           >
-            <img src={card.imageUrl} alt={`Card ${card.id}`} className="card-img" />
+            <div className="h2-img">
+              <img src={card.imageUrl} alt={`Card ${card.id}`} className="card-img" />
+            </div>
+            <div className="h2-texts">
+              <h3 className="lato-regular">{card.h3}</h3>
+              <p className="lato-regular">{card.p}</p>
+            </div>
           </motion.div>
         ))}
       </div>
 
       <div className="controls">
-      <button
+        <button
           onClick={() => handleSwipe("left")}
           style={{
             visibility: currentIndex === 0 ? "hidden" : "visible", // Ukrywamy, ale zachowujemy miejsce
