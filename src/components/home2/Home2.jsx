@@ -18,6 +18,7 @@ export default function Home2() {
     cards.map((_, index) => cards.length - index)
   );
 
+  
   const handleSwipe = (direction) => {
     const newZIndexes = [...zIndexes];
 
