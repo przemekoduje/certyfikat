@@ -4,12 +4,12 @@ import "./home2.scss";
 
 // Karty z obrazami
 const cards = [
-  { id: 1, imageUrl: "/images/Tło usunięte (scene1).png", h3: "Czy Twój dom jest energooszczędny?", p: "Świadectwo charakterystyki energetycznej pomaga odpowiedzieć na to pytanie." },
-  { id: 2, imageUrl: "/images/Tło usunięte (scene2).png", h3: "Pierwszy krok do oszczędności.", p: "Z pomocą specjalisty możesz dowiedzieć się, jak poprawić efektywność energetyczną swojego domu." },
-  { id: 3, imageUrl: "/images/Tło usunięte (scene3).png", h3: "Zoptymalizuj swój dom.", p: "Świadectwo energetyczne wskazuje, gdzie Twój dom może zaoszczędzić energię – od izolacji po lepsze okna." },
-  { id: 4, imageUrl: "/images/Tło usunięte (scene4).png", h3: "Komfort i oszczędność.", p: "Lepsza efektywność energetyczna to niższe rachunki, większy komfort życia i przyjazność dla natury." },
-  { id: 5, imageUrl: "/images/Tło usunięte (scene5).png", h3: "Świadectwo to krok ku lepszemu środowisku.", p: "Dzięki świadectwom energetycznym zmniejszamy nasz ślad węglowy i dbamy o przyszłość planety." },
-  { id: 6, imageUrl: "/images/Tło usunięte (scene6).png", h3: "Świadectwo to inwestycja w naturę.", p: "Z każdym świadectwem sadzimy drzewa, wspólnie tworząc zdrowszą przyszłość dla nas wszystkich." },
+  { id: 1, imageUrl: "/images/scene1.png", h3: "Czy Twój dom jest energooszczędny?", p: "Świadectwo charakterystyki energetycznej pomaga odpowiedzieć na to pytanie." },
+  { id: 2, imageUrl: "/images/scene2.png", h3: "Pierwszy krok do oszczędności.", p: "Z pomocą specjalisty możesz dowiedzieć się, jak poprawić efektywność energetyczną swojego domu." },
+  { id: 3, imageUrl: "/images/scene3.png", h3: "Zoptymalizuj swój dom.", p: "Świadectwo energetyczne wskazuje, gdzie Twój dom może zaoszczędzić energię – od izolacji po lepsze okna." },
+  { id: 4, imageUrl: "/images/scene4.png", h3: "Komfort i oszczędność.", p: "Lepsza efektywność energetyczna to niższe rachunki, większy komfort życia i przyjazność dla natury." },
+  { id: 5, imageUrl: "/images/scene5.png", h3: "Świadectwo to krok ku lepszemu środowisku.", p: "Dzięki świadectwom energetycznym zmniejszamy nasz ślad węglowy i dbamy o przyszłość planety." },
+  { id: 6, imageUrl: "/images/scene6.png", h3: "Świadectwo to inwestycja w naturę.", p: "Z każdym świadectwem sadzimy drzewa, wspólnie tworząc zdrowszą przyszłość dla nas wszystkich." },
 ];
 
 export default function Home2() {
@@ -75,6 +75,7 @@ export default function Home2() {
   return (
     <div className="home2-container">
       <h1 className="lato-regular">Na co Ci ten kłopot?</h1>
+      <span className="short  lato-regular">Świadectwo energetyczne to klucz do oszczędności i podniesienia wartości nieruchomości. Dzięki niemu wiesz, jak poprawić efektywność energetyczną swojego domu i wspierać ochronę środowiska.</span>
       <div className="card-swipe-container">
         {cards.map((card, index) => (
           <motion.div

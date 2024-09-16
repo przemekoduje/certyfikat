@@ -1,7 +1,14 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import "./home1.scss";
 
 export default function Home1() {
+
+  const navigate = useNavigate(); // Używamy useNavigate do nawigacji
+
+  const handleButtonClick = () => {
+    navigate("/form"); // Przenosimy do /form
+  };
   return (
     <div className="home1-container">
         <div className="background">
@@ -16,7 +23,8 @@ export default function Home1() {
               Od każdego wystawionego dokumentu przekazujemy <span className="highlight">10 zł na sadzenie drzew</span>, łącząc energooszczędność z realnym wsparciem dla natury.
             </span>
           </div>
-          <button>Zróbmy to</button>
+          
+          <button onClick={handleButtonClick}>Zróbmy to</button>
         </div>
 
     </div>
