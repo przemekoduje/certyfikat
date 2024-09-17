@@ -8,12 +8,23 @@ import Step5 from "../../components/forms/step5/Step5";
 import Step6 from "../../components/forms/step6/Step6";
 import Step7 from "../../components/forms/step7/Step7";
 import Step8 from "../../components/forms/step8/Step8";
+import EmailForm from "../../components/emailForm/EmailForm";
+
 
 export default function FormPage() {
   const [currentStep, setCurrentStep] = useState(() => {
     const savedStep = localStorage.getItem("currentStep");
     return savedStep ? parseInt(savedStep, 10) : 1;
   });
+  const [showEmailForm, setShowEmailForm] = useState(false);
+
+  const handleShowEmailForm = () => {
+    setShowEmailForm(true);
+  };
+
+  const handleCloseEmailForm = () => {
+    setShowEmailForm(false);
+  };
 
   const [formData, setFormData] = useState(() => {
     const savedData = localStorage.getItem("formData");
@@ -218,25 +229,32 @@ export default function FormPage() {
           <img src="/images/profil.jpg" alt="Profile" />
         </div>
         <hr className="full-width-line" />
-  
+
         <div className="left-section">
           <img
             src="/images/back05 2.png"
             alt="Background"
             className="reacting-image"
           />
+
         </div>
-  
+
+
         <div className="right-section">
+
+          <button onClick={handleShowEmailForm}>Wyślij e-mail</button>
+
+          {showEmailForm && <EmailForm onClose={handleCloseEmailForm} />}
+
           {renderStep()}
-  
+
           {/* Przycisk do resetowania formularza */}
           <button className="reset-button" onClick={handleResetClick}>
             <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#5f6368"><path d="M0 0h24v24H0V0z" fill="none" /><path d="M13 3c-4.97 0-9 4.03-9 9H1l4 3.99L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.25 2.52.77-1.28-3.52-2.09V8z" /></svg>
           </button>
         </div>
       </div>
-  
+
       {/* Okienko potwierdzenia */}
       {showConfirmation && (
         <div className="confirmation-popup lato-light">
@@ -250,5 +268,5 @@ export default function FormPage() {
       )}
     </div>
   );
-  
+
 }
