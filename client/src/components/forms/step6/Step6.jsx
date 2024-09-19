@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import "./step6.scss";
 
-export default function Step6({ nextStep, prevStep }) {
+export default function Step6({ nextStep, prevStep, skippedQuestions, setSkippedQuestions, data, setData, resetCurrentStep, addSkippedQuestion }) {
   // Inicjalizowanie stanu z localStorage, jeśli dane istnieją
   const [formData, setFormData] = useState(() => {
     const savedData = localStorage.getItem('step6FormData');
@@ -40,10 +40,27 @@ export default function Step6({ nextStep, prevStep }) {
     setFormData({ ...formData, [name]: value });
   };
 
-  // Sprawdza, czy wszystkie pola są wypełnione
-  const isFormValid = Object.values(formData).every(
-    (value) => value.trim() !== ""
-  );
+  // Funkcja obsługująca pomijanie pytań
+  const skipQuestion = (question, options) => {
+    addSkippedQuestion(6, question, options); // Dodaje pytanie do pominiętych pytań
+  };
+
+  
+
+  // Sprawdza, czy wszystkie pola są wypełnione lub czy wszystkie pytania zostały pominięte
+  const isFormValid = () => {
+    // Ustaw domyślną wartość dla skippedQuestions, jeśli jest undefined
+    const skipped = skippedQuestions || [];
+  
+    // Sprawdza, czy wszystkie pola są wypełnione
+    const allFieldsFilled = Object.values(formData).every((value) => value.trim() !== '');
+  
+    // Sprawdza, czy wszystkie pytania zostały pominięte
+    const allQuestionsSkipped = skipped.some((skipped) => skipped.step === 6);
+  
+    // Formularz jest ważny, jeśli wszystkie pola są wypełnione lub wszystkie pytania są pominięte
+    return allFieldsFilled || allQuestionsSkipped;
+  };
 
   useEffect(() => {
     // Zapisywanie stanu do localStorage po każdej zmianie
@@ -72,6 +89,9 @@ export default function Step6({ nextStep, prevStep }) {
               </option>
             ))}
           </select>
+          <button onClick={() => skipQuestion('Materiał ścian zewnętrznych', scianaOptions)}>
+            Pomiń
+          </button>
         </div>
         <div className="input-wrapper">
           <input
@@ -87,6 +107,9 @@ export default function Step6({ nextStep, prevStep }) {
           >
             Grubość ściany zewnętrznej [cm]
           </label>
+          <button onClick={() => skipQuestion('Grubość ściany zewnętrznej [cm]')}>
+            Pomiń
+          </button>
         </div>
 
         <div className="input-wrapper">
@@ -106,6 +129,9 @@ export default function Step6({ nextStep, prevStep }) {
               </option>
             ))}
           </select>
+          <button onClick={() => skipQuestion('Materiał izolacji ściany zewnętrznej', izolacjaOptions)}>
+            Pomiń
+          </button>
         </div>
         <div className="input-wrapper">
           <input
@@ -121,6 +147,9 @@ export default function Step6({ nextStep, prevStep }) {
           >
             Grubość materiału izolacyjnego [cm]
           </label>
+          <button onClick={() => skipQuestion('Grubość materiału izolacyjnego [cm]')}>
+            Pomiń
+          </button>
         </div>
 
         <div className="input-wrapper">
@@ -138,6 +167,9 @@ export default function Step6({ nextStep, prevStep }) {
           <label className={`lato-light ${formData.rok ? "active" : ""}`}>
             Rok oddania budynku do uzytkowania
           </label>
+          <button onClick={() => skipQuestion('Rok oddania budynku do uzytkowania')}>
+            Pomiń
+          </button>
         </div>
 
         <div className="input-wrapper">
@@ -155,6 +187,9 @@ export default function Step6({ nextStep, prevStep }) {
           <label className={`lato-light ${formData.termo ? "active" : ""}`}>
             Rok ostatniej termomodernizacji
           </label>
+          <button onClick={() => skipQuestion('Rok ostatniej termomodernizacji')}>
+            Pomiń
+          </button>
         </div>
       </div>
 
