@@ -9,7 +9,7 @@ export default function Navbar() {
       <div className='navbar'>
         <div className="logoArea">
           <div className="logo">
-            <img src="/images/logo_image.png" alt="" />
+            <img src="/images/logo.png" alt="" />
           </div>
           {/* <div className="logoText">
           <span>[ Greenspan ]</span>

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import "./step6.scss";
 
 export default function Step6({ nextStep, prevStep, skippedQuestions, setSkippedQuestions, data, setData, resetCurrentStep, addSkippedQuestion }) {
-  // Inicjalizowanie stanu z localStorage, jeśli dane istnieją
+  
   const [formData, setFormData] = useState(() => {
     const savedData = localStorage.getItem('step6FormData');
     return savedData ? JSON.parse(savedData) : {
@@ -34,36 +34,45 @@ export default function Step6({ nextStep, prevStep, skippedQuestions, setSkipped
     "brak izolacji",
   ]);
 
+  const [skipButtonsDisabled, setSkipButtonsDisabled] = useState({
+    sciana: false,
+    scianagrubosc: false,
+    izolacja: false,
+    izolacjagrubosc: false,
+    rok: false,
+    termo: false,
+  });
+
   // Funkcja obsługująca zmianę w inputach
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
+
+    // Zablokuj przycisk "Pomiń", jeśli wybrano opcję z listy
+    setSkipButtonsDisabled((prev) => ({
+      ...prev,
+      [name]: true,
+    }));
   };
 
   // Funkcja obsługująca pomijanie pytań
   const skipQuestion = (question, options) => {
-    addSkippedQuestion(6, question, options); // Dodaje pytanie do pominiętych pytań
+    addSkippedQuestion(6, question, options);
+
+    // Zablokuj odpowiedni przycisk "Pomiń"
+    setSkipButtonsDisabled((prev) => ({
+      ...prev,
+      [question.toLowerCase()]: true,
+    }));
   };
 
-  
-
-  // Sprawdza, czy wszystkie pola są wypełnione lub czy wszystkie pytania zostały pominięte
   const isFormValid = () => {
-    // Ustaw domyślną wartość dla skippedQuestions, jeśli jest undefined
-    const skipped = skippedQuestions || [];
-  
-    // Sprawdza, czy wszystkie pola są wypełnione
     const allFieldsFilled = Object.values(formData).every((value) => value.trim() !== '');
-  
-    // Sprawdza, czy wszystkie pytania zostały pominięte
-    const allQuestionsSkipped = skipped.some((skipped) => skipped.step === 6);
-  
-    // Formularz jest ważny, jeśli wszystkie pola są wypełnione lub wszystkie pytania są pominięte
+    const allQuestionsSkipped = skippedQuestions.some((skipped) => skipped.step === 6);
     return allFieldsFilled || allQuestionsSkipped;
   };
 
   useEffect(() => {
-    // Zapisywanie stanu do localStorage po każdej zmianie
     localStorage.setItem('step6FormData', JSON.stringify(formData));
   }, [formData]);
 
@@ -89,10 +98,14 @@ export default function Step6({ nextStep, prevStep, skippedQuestions, setSkipped
               </option>
             ))}
           </select>
-          <button onClick={() => skipQuestion('Materiał ścian zewnętrznych', scianaOptions)}>
+          <button
+            onClick={() => skipQuestion('sciana', scianaOptions)}
+            disabled={skipButtonsDisabled.sciana}
+          >
             Pomiń
           </button>
         </div>
+
         <div className="input-wrapper">
           <input
             className="lato-light"
@@ -107,7 +120,10 @@ export default function Step6({ nextStep, prevStep, skippedQuestions, setSkipped
           >
             Grubość ściany zewnętrznej [cm]
           </label>
-          <button onClick={() => skipQuestion('Grubość ściany zewnętrznej [cm]')}>
+          <button
+            onClick={() => skipQuestion('scianagrubosc')}
+            disabled={skipButtonsDisabled.scianagrubosc}
+          >
             Pomiń
           </button>
         </div>
@@ -129,10 +145,14 @@ export default function Step6({ nextStep, prevStep, skippedQuestions, setSkipped
               </option>
             ))}
           </select>
-          <button onClick={() => skipQuestion('Materiał izolacji ściany zewnętrznej', izolacjaOptions)}>
+          <button
+            onClick={() => skipQuestion('izolacja', izolacjaOptions)}
+            disabled={skipButtonsDisabled.izolacja}
+          >
             Pomiń
           </button>
         </div>
+
         <div className="input-wrapper">
           <input
             className="lato-light"
@@ -147,7 +167,10 @@ export default function Step6({ nextStep, prevStep, skippedQuestions, setSkipped
           >
             Grubość materiału izolacyjnego [cm]
           </label>
-          <button onClick={() => skipQuestion('Grubość materiału izolacyjnego [cm]')}>
+          <button
+            onClick={() => skipQuestion('izolacjagrubosc')}
+            disabled={skipButtonsDisabled.izolacjagrubosc}
+          >
             Pomiń
           </button>
         </div>
@@ -159,15 +182,17 @@ export default function Step6({ nextStep, prevStep, skippedQuestions, setSkipped
             name="rok"
             value={formData.rok}
             onChange={handleChange}
-            min="1900" // Zakres lat
-            max={new Date().getFullYear()} // Maksymalny rok to bieżący rok
-            step="1"
+            min="1900"
+            max={new Date().getFullYear()}
             required
           />
           <label className={`lato-light ${formData.rok ? "active" : ""}`}>
             Rok oddania budynku do uzytkowania
           </label>
-          <button onClick={() => skipQuestion('Rok oddania budynku do uzytkowania')}>
+          <button
+            onClick={() => skipQuestion('rok')}
+            disabled={skipButtonsDisabled.rok}
+          >
             Pomiń
           </button>
         </div>
@@ -179,15 +204,17 @@ export default function Step6({ nextStep, prevStep, skippedQuestions, setSkipped
             name="termo"
             value={formData.termo}
             onChange={handleChange}
-            min="1900" // Zakres lat
-            max={new Date().getFullYear()} // Maksymalny rok to bieżący rok
-            step="1"
+            min="1900"
+            max={new Date().getFullYear()}
             required
           />
           <label className={`lato-light ${formData.termo ? "active" : ""}`}>
             Rok ostatniej termomodernizacji
           </label>
-          <button onClick={() => skipQuestion('Rok ostatniej termomodernizacji')}>
+          <button
+            onClick={() => skipQuestion('termo')}
+            disabled={skipButtonsDisabled.termo}
+          >
             Pomiń
           </button>
         </div>
@@ -196,7 +223,7 @@ export default function Step6({ nextStep, prevStep, skippedQuestions, setSkipped
       <button className="back" onClick={prevStep}>
         &#x2190;
       </button>
-      <button onClick={nextStep} disabled={!isFormValid}>
+      <button onClick={nextStep} disabled={!isFormValid()}>
         Dalej
       </button>
     </div>
