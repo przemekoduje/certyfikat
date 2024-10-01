@@ -1,47 +1,43 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from "react";
+import "./emailForm.scss";
 
-import './emailForm.scss'
-import api from '../../utils/axios';
-
-const EmailForm = ({ onClose }) => {
-  const [from, setFrom] = useState('');
-  const [to, setTo] = useState('');
-  const [note, setNote] = useState('');
-  const [senderName, setSenderName] = useState(''); // Imię i nazwisko nadawcy
-  const [propertyAddress, setPropertyAddress] = useState(''); // Adres nieruchomości
+const EmailForm = ({
+  onClose,
+  handleGenerateAndSendPDF,
+  senderName: initialSenderName,
+  propertyAddress: initialPropertyAddress,
+  from: initialFrom,
+}) => {
+  const [from, setFrom] = useState(initialFrom || "");
+  const [to, setTo] = useState("");
+  const [note, setNote] = useState("");
+  const [senderName, setSenderName] = useState(initialSenderName || "");
+  const [propertyAddress, setPropertyAddress] = useState(initialPropertyAddress || "");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+
+  // Aktualizujemy stany, jeśli wartości początkowe ulegną zmianie
+  useEffect(() => {
+    setFrom(initialFrom);
+    setSenderName(initialSenderName);
+    setPropertyAddress(initialPropertyAddress);
+  }, [initialFrom, initialSenderName, initialPropertyAddress]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
 
-    // Redagowanie wiadomości e-mail z dynamicznymi danymi
     const message = `
       Dzień dobry,
-      W imieniu Pani/Pana ${senderName}, zwracamy się z prośbą o pomoc w uzupełnieniu informacji dotyczących nieruchomości położonej przy ul. ${propertyAddress}, 
-      Państwa wiedza i doświadczenie jako zarządcy przedmiotowej nieruchomości będą  nieocenione w procesie przygotowania Świadectwa charakterystyki energetycznej tej nieruchomości.
-
-      W załączonym pliku PDF znajdą Państwo pytania, na które odpowiedzi pozwolą nam sporządzić certyfikat. Będziemy wdzięczni za wypełnienie dokumentu i odesłanie go na adres e-mail (${from}) lub na adres firmy Certyfikaty: kontakt@certyfikaty.pl.
-
-      Dziękujemy za poświęcony czas i wsparcie. Państwa wiedza techniczna jest kluczowa dla sprawnego zakończenia tego procesu.
-
-      Z wyrazami szacunku,
-      Przemysław Rakotny 
-      W imieniu Certyfikaty.pl
+      W imieniu Pani/Pana ${senderName}, zwracamy się z prośbą o pomoc w uzupełnieniu informacji dotyczących nieruchomości położonej przy ul. ${propertyAddress}.
+      W załączonym pliku PDF znajdą Państwo pytania, na które odpowiedzi pozwolą nam sporządzić certyfikat. Będziemy wdzięczni za wypełnienie dokumentu i odesłanie go.
     `;
 
     try {
-      await api.post('/send-email', { 
-        from, 
-        to, 
-        note: message // Przesyłamy dynamicznie utworzoną wiadomość
-      });
-      alert('Email wysłany pomyślnie!');
-      onClose(); // Zamknięcie formularza po udanym wysłaniu
+      await handleGenerateAndSendPDF(from, to, message);
     } catch (err) {
-      setError('Wystąpił błąd podczas wysyłania e-maila.');
+      setError("Wystąpił błąd podczas wysyłania e-maila.");
       console.error(err);
     } finally {
       setLoading(false);
@@ -49,49 +45,54 @@ const EmailForm = ({ onClose }) => {
   };
 
   return (
-    <div className="email-form-popup">
-      <h2>Wyślij wiadomość e-mail</h2>
+    <div className="email-form-popup lato-light">
       <form onSubmit={handleSubmit}>
         <label>
-          Imię i nazwisko nadawcy:
-          <input 
-            type="text" 
-            value={senderName} 
-            onChange={(e) => setSenderName(e.target.value)} 
-            required 
+          <p className="lato-regular">Imię i nazwisko:</p>
+          <input
+            type="text"
+            value={senderName}
+            onChange={(e) => setSenderName(e.target.value)}
+            required
+            placeholder="Imię i nazwisko nadawcy"
           />
         </label>
         <label>
-          Adres nieruchomości:
-          <input 
-            type="text" 
-            value={propertyAddress} 
-            onChange={(e) => setPropertyAddress(e.target.value)} 
-            required 
+        <p className="lato-regular">Adres nieruchomości:</p>
+          <input
+            type="text"
+            value={propertyAddress}
+            onChange={(e) => setPropertyAddress(e.target.value)}
+            required
+            placeholder="Adres nieruchomosci"
           />
         </label>
         <label>
-          Od:
-          <input 
-            type="email" 
-            value={from} 
-            onChange={(e) => setFrom(e.target.value)} 
-            required 
+        <p className="lato-regular">Od:</p>
+          <input
+            type="email"
+            value={from}
+            onChange={(e) => setFrom(e.target.value)}
+            required
+            placeholder="email nadawcy"
           />
         </label>
         <label>
-          Do:
-          <input 
-            type="email" 
-            value={to} 
-            onChange={(e) => setTo(e.target.value)} 
-            required 
+        <p className="lato-regular">Do:</p>
+          <input
+            type="email"
+            value={to}
+            onChange={(e) => setTo(e.target.value)}
+            required
+            placeholder="email odbiorcy / zarządcy"
           />
         </label>
-        <button type="submit" disabled={loading}>Wyślij</button>
+        <button type="submit" disabled={loading}>
+          Wyślij
+        </button>
         {error && <p>{error}</p>}
       </form>
-      <button onClick={onClose}>Anuluj</button>
+      {/* <button onClick={onClose}>Anuluj</button> */}
     </div>
   );
 };

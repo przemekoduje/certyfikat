@@ -1,0 +1,51 @@
+.avatar-button {
+    position: relative;
+    width: 50px;
+    height: 50px;
+    border: none;
+    background-color: transparent;
+    margin-left: 20px;
+    cursor: pointer;
+  }
+  
+  .avatar-button img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%; /* Obrazek będzie okrągły */
+    object-fit: cover;
+    transition: box-shadow 0.3s ease;
+  }
+  
+  .avatar-button img.pulsing {
+    animation: pulseBorder 1s infinite alternate;
+  }
+  
+  @keyframes pulseBorder {
+    0% {
+      box-shadow: 0 0 5px 2px rgba(255, 0, 0, 0.5); /* Pulsujący czerwony efekt */
+    }
+    100% {
+      box-shadow: 0 0 10px 4px rgba(255, 0, 0, 1);
+    }
+  }
+  
+  /* Styl dymka (tooltip) */
+  .tooltip {
+    position: absolute;
+    top: -30px; /* Umieszczamy dymek nad przyciskiem */
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: black;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 12px;
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  
+  .avatar-button .tooltip {
+    opacity: 1; /* Wyświetl dymek */
+  }
+  

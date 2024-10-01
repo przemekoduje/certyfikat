@@ -1,32 +1,45 @@
 import React, { useEffect, useState } from "react";
 import "./step6.scss";
 
-export default function Step6({ nextStep, prevStep, skippedQuestions, setSkippedQuestions, data, setData, resetCurrentStep, addSkippedQuestion }) {
-  
-  const [formData, setFormData] = useState(() => {
-    const savedData = localStorage.getItem('step6FormData');
-    return savedData ? JSON.parse(savedData) : {
-      sciana: "",
-      scianagrubosc: "",
-      izolacja: "",
-      izolacjagrubosc: "",
-      rok: "",
-      termo: "",
-    };
+export default function Step6({
+  nextStep,
+  prevStep,
+  skippedQuestions,
+  setSkippedQuestions,
+  data,
+  setData,
+  resetCurrentStep,
+  addSkippedQuestion,
+  removeSkippedQuestion,
+}) {
+  const [tempData, setTempData] = useState(() => {
+    const savedData = localStorage.getItem("step6FormData");
+    return savedData
+      ? JSON.parse(savedData)
+      : {
+          sciana: "",
+          scianagrubosc: "",
+          izolacja: "",
+          izolacjagrubosc: "",
+          rok: "",
+          termo: "",
+        };
   });
 
   const [scianaOptions] = useState([
+    "--Brak informacji",
     "beton komórkowy",
     "Ytong",
     "cegła",
     "silka",
     "porotherm",
-    "zelbet",
+    "żelbet",
     "drewno",
-    "pustak zuzlowy",
+    "pustak żużlowy",
   ]);
 
   const [izolacjaOptions] = useState([
+    "--Brak informacji",
     "styropian biały",
     "styropian grafitowy",
     "wełna mineralna",
@@ -43,49 +56,88 @@ export default function Step6({ nextStep, prevStep, skippedQuestions, setSkipped
     termo: false,
   });
 
-  // Funkcja obsługująca zmianę w inputach
+  const [tempSkippedQuestions, setTempSkippedQuestions] = useState(
+    skippedQuestions
+  );
+
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    setTempData({ ...tempData, [name]: value });
 
-    // Zablokuj przycisk "Pomiń", jeśli wybrano opcję z listy
-    setSkipButtonsDisabled((prev) => ({
-      ...prev,
-      [name]: true,
-    }));
+    if (name === "scianagrubosc" && value === "0") {
+      // Jeśli grubość ściany to 0, traktujemy to jako brak danych
+      skipQuestion(name);
+    } else if (name === "izolacjagrubosc" && value === "0") {
+      // Jeśli grubość izolacji to 0, traktujemy to jako brak danych
+      skipQuestion(name);
+    } else if (value === "--Brak informacji") {
+      skipQuestion(name, getOptionsForQuestion(name));
+    } else {
+      // Jeśli użytkownik wypełnia pole, usuwamy je z pytań pominiętych
+      setTempSkippedQuestions((prev) =>
+        prev.filter((item) => item.question !== name)
+      );
+    }
   };
 
-  // Funkcja obsługująca pomijanie pytań
-  const skipQuestion = (question, options) => {
-    addSkippedQuestion(6, question, options);
+  const getOptionsForQuestion = (question) => {
+    switch (question) {
+      case "sciana":
+        return scianaOptions;
+      case "izolacja":
+        return izolacjaOptions;
+      default:
+        return [];
+    }
+  };
 
-    // Zablokuj odpowiedni przycisk "Pomiń"
-    setSkipButtonsDisabled((prev) => ({
-      ...prev,
-      [question.toLowerCase()]: true,
+  const skipQuestion = (question) => {
+    if (!tempSkippedQuestions.some((item) => item.question === question)) {
+      setTempSkippedQuestions((prev) => [
+        ...prev,
+        { step: 6, question, options: getOptionsForQuestion(question) },
+      ]);
+    }
+  };
+
+  const handleNextStep = () => {
+    setData((prevData) => ({
+      ...prevData,
+      ...tempData,
     }));
+
+    setSkippedQuestions(tempSkippedQuestions);
+
+    localStorage.setItem("step6FormData", JSON.stringify(tempData));
+
+    nextStep();
   };
 
   const isFormValid = () => {
-    const allFieldsFilled = Object.values(formData).every((value) => value.trim() !== '');
-    const allQuestionsSkipped = skippedQuestions.some((skipped) => skipped.step === 6);
+    const allFieldsFilled = Object.values(tempData).every(
+      (value) => value.trim() !== ""
+    );
+    const allQuestionsSkipped = tempSkippedQuestions.some(
+      (skipped) => skipped.step === 6
+    );
+
     return allFieldsFilled || allQuestionsSkipped;
   };
-
-  useEffect(() => {
-    localStorage.setItem('step6FormData', JSON.stringify(formData));
-  }, [formData]);
 
   return (
     <div className="step6">
       <h2 className="merriweather-light">Szczegółowe dane nieruchomości</h2>
 
       <div className="inputs">
+        {/* Materiał ścian zewnętrznych */}
         <div className="input-wrapper">
+          <label className={`lato-light ${tempData.sciana ? "active" : ""}`}>
+            Materiał ścian zewnętrznych
+          </label>
           <select
             className="lato-light"
             name="sciana"
-            value={formData.sciana}
+            value={tempData.sciana}
             onChange={handleChange}
             required
           >
@@ -98,41 +150,34 @@ export default function Step6({ nextStep, prevStep, skippedQuestions, setSkipped
               </option>
             ))}
           </select>
-          <button
-            onClick={() => skipQuestion('sciana', scianaOptions)}
-            disabled={skipButtonsDisabled.sciana}
-          >
-            Pomiń
-          </button>
         </div>
 
+        {/* Grubość ściany zewnętrznej */}
         <div className="input-wrapper">
           <input
             className="lato-light"
             type="number"
             name="scianagrubosc"
-            value={formData.scianagrubosc}
+            value={tempData.scianagrubosc}
             onChange={handleChange}
             required
           />
           <label
-            className={`lato-light ${formData.scianagrubosc ? "active" : ""}`}
+            className={`lato-light ${tempData.scianagrubosc ? "active" : ""}`}
           >
-            Grubość ściany zewnętrznej [cm]
+            Grubość ściany zewnętrznej [cm] (wpisz 0 jeśli brak danych)
           </label>
-          <button
-            onClick={() => skipQuestion('scianagrubosc')}
-            disabled={skipButtonsDisabled.scianagrubosc}
-          >
-            Pomiń
-          </button>
         </div>
 
+        {/* Materiał izolacji ściany zewnętrznej */}
         <div className="input-wrapper">
+          <label className={`lato-light ${tempData.izolacja ? "active" : ""}`}>
+            Materiał izolacji ściany zewnętrznej
+          </label>
           <select
             className="lato-light"
             name="izolacja"
-            value={formData.izolacja}
+            value={tempData.izolacja}
             onChange={handleChange}
             required
           >
@@ -145,85 +190,66 @@ export default function Step6({ nextStep, prevStep, skippedQuestions, setSkipped
               </option>
             ))}
           </select>
-          <button
-            onClick={() => skipQuestion('izolacja', izolacjaOptions)}
-            disabled={skipButtonsDisabled.izolacja}
-          >
-            Pomiń
-          </button>
         </div>
 
+        {/* Grubość materiału izolacyjnego */}
         <div className="input-wrapper">
           <input
             className="lato-light"
             type="number"
             name="izolacjagrubosc"
-            value={formData.izolacjagrubosc}
+            value={tempData.izolacjagrubosc}
             onChange={handleChange}
             required
           />
           <label
-            className={`lato-light ${formData.izolacjagrubosc ? "active" : ""}`}
+            className={`lato-light ${
+              tempData.izolacjagrubosc ? "active" : ""
+            }`}
           >
-            Grubość materiału izolacyjnego [cm]
+            Grubość materiału izolacyjnego [cm] (wpisz 0 jeśli brak danych)
           </label>
-          <button
-            onClick={() => skipQuestion('izolacjagrubosc')}
-            disabled={skipButtonsDisabled.izolacjagrubosc}
-          >
-            Pomiń
-          </button>
         </div>
 
+        {/* Rok oddania budynku do użytku */}
         <div className="input-wrapper">
           <input
             className="lato-light"
             type="number"
             name="rok"
-            value={formData.rok}
+            value={tempData.rok}
             onChange={handleChange}
             min="1900"
             max={new Date().getFullYear()}
             required
           />
-          <label className={`lato-light ${formData.rok ? "active" : ""}`}>
-            Rok oddania budynku do uzytkowania
+          <label className={`lato-light ${tempData.rok ? "active" : ""}`}>
+            Rok oddania budynku do użytku
           </label>
-          <button
-            onClick={() => skipQuestion('rok')}
-            disabled={skipButtonsDisabled.rok}
-          >
-            Pomiń
-          </button>
         </div>
 
+        {/* Rok ostatniej termomodernizacji */}
         <div className="input-wrapper">
           <input
             className="lato-light"
             type="number"
             name="termo"
-            value={formData.termo}
+            value={tempData.termo}
             onChange={handleChange}
             min="1900"
             max={new Date().getFullYear()}
             required
           />
-          <label className={`lato-light ${formData.termo ? "active" : ""}`}>
+          <label className={`lato-light ${tempData.termo ? "active" : ""}`}>
             Rok ostatniej termomodernizacji
           </label>
-          <button
-            onClick={() => skipQuestion('termo')}
-            disabled={skipButtonsDisabled.termo}
-          >
-            Pomiń
-          </button>
         </div>
       </div>
 
       <button className="back" onClick={prevStep}>
         &#x2190;
       </button>
-      <button onClick={nextStep} disabled={!isFormValid()}>
+      <button onClick={handleNextStep} disabled={!isFormValid()}>
         Dalej
       </button>
     </div>

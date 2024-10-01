@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import "./step5.scss";
+import CustomSelect from "../../customSelect/CustomSelect";
 
 export default function Step5({
   nextStep,
@@ -13,63 +14,63 @@ export default function Step5({
   removeSkippedQuestion,
 }) {
   const [tempData, setTempData] = useState(() => {
-    const savedData = localStorage.getItem('step5FormData');
+    const savedData = localStorage.getItem("step5FormData");
     return savedData
       ? JSON.parse(savedData)
       : {
-          ogrzewanie: '',
-          wodaciepla: '',
-          grzejniki: '',
-          wentylacja: '',
-          szyby: '',
+          ogrzewanie: "",
+          wodaciepla: "",
+          grzejniki: "",
+          wentylacja: "",
+          szyby: "",
         };
   });
 
   const [powOptions] = useState([
-    'Brak informacji', 
-    'sieć miejska',
-    'grzejniki elektryczne',
-    'kocioł na biomase',
-    'kocioł na ekogroszek',
-    'kocioł węglowy',
-    'kocioł olejowy',
-    'kocioł gazowy w mieszkaniu',
-    'kocioł gazowy w kotłowni',
-    'kocioł gazowy w kotłowni zewn.',
-    'energia geotermalna',
-    'piec kaflowy',
+    "--Brak informacji",
+    "sieć miejska",
+    "grzejniki elektryczne",
+    "kocioł na biomase",
+    "kocioł na ekogroszek",
+    "kocioł węglowy",
+    "kocioł olejowy",
+    "kocioł gazowy w mieszkaniu",
+    "kocioł gazowy w kotłowni",
+    "kocioł gazowy w kotłowni zewn.",
+    "energia geotermalna",
+    "piec kaflowy",
   ]);
 
   const [wodaOptions] = useState([
-    'Brak informacji',
-    'sieć miejska',
-    'elektryczny podgrzewacz akumulacyjny',
-    'elektryczny podgrzewacz przepływowy',
-    'kocioł na biomase',
-    'kocioł na ekogroszek',
-    'kocioł węglowy',
-    'kocioł olejowy',
-    'kocioł gazowy w mieszkaniu',
-    'kocioł gazowy w kotłowni',
-    'kocioł gazowy w kotłowni zewn.',
-    'energia geotermalna',
-    'piec kaflowy',
+    "--Brak informacji",
+    "sieć miejska",
+    "elektryczny podgrzewacz akumulacyjny",
+    "elektryczny podgrzewacz przepływowy",
+    "kocioł na biomase",
+    "kocioł na ekogroszek",
+    "kocioł węglowy",
+    "kocioł olejowy",
+    "kocioł gazowy w mieszkaniu",
+    "kocioł gazowy w kotłowni",
+    "kocioł gazowy w kotłowni zewn.",
+    "energia geotermalna",
+    "piec kaflowy",
   ]);
 
   const [grzejnikOptions] = useState([
-    'Brak informacji',
-    'płytowe',
-    'żeliwne',
-    'członowe',
-    'podłogowe',
-    'ogrzewanie piecowe lub kominkowe',
+    "--Brak informacji",
+    "płytowe",
+    "żeliwne",
+    "członowe",
+    "podłogowe",
+    "ogrzewanie piecowe lub kominkowe",
   ]);
 
   const [wentylOptions] = useState([
-    'Brak informacji',
-    'grawitacyjna',
-    'mechaniczna wywiewna',
-    'mechaniczna wywiewno-nawiewna',
+    "--Brak informacji",
+    "grawitacyjna",
+    "mechaniczna wywiewna",
+    "mechaniczna wywiewno-nawiewna",
   ]);
 
   const [skipButtonsDisabled, setSkipButtonsDisabled] = useState({
@@ -80,78 +81,68 @@ export default function Step5({
     szyby: false,
   });
 
-  // Tymczasowe zarządzanie listą pytań pominiętych (nie wysyłane dopóki nie naciśnięto "Dalej")
-  const [tempSkippedQuestions, setTempSkippedQuestions] = useState(skippedQuestions);
+  const [tempSkippedQuestions, setTempSkippedQuestions] =
+    useState(skippedQuestions);
 
-  // Funkcja obsługująca zmianę w tempData
   const handleChange = (e) => {
     const { name, value } = e.target;
     setTempData({ ...tempData, [name]: value });
 
-    // Jeśli użytkownik wybierze "Brak informacji", wywołaj skipQuestion i dezaktywuj przycisk
-    if (value === 'Brak informacji') {
+    if (name === "szyby" && value === "0") {
+      // If szyby is 0, skip the question
+      skipQuestion(name);
+    } else if (value === "--Brak informacji") {
       skipQuestion(name, getOptionsForQuestion(name));
     } else {
-      // Usuń pytanie z listy pominiętych, jeśli wybrano coś innego
-      setTempSkippedQuestions((prev) => prev.filter((item) => item.question !== name));
-      setSkipButtonsDisabled((prev) => ({
-        ...prev,
-        [name]: false,
-      }));
+      setTempSkippedQuestions((prev) =>
+        prev.filter((item) => item.question !== name)
+      );
     }
   };
 
-  // Funkcja zwracająca opcje dla danego pytania
   const getOptionsForQuestion = (question) => {
     switch (question) {
-      case 'ogrzewanie':
+      case "ogrzewanie":
         return powOptions;
-      case 'wodaciepla':
+      case "wodaciepla":
         return wodaOptions;
-      case 'grzejniki':
+      case "grzejniki":
         return grzejnikOptions;
-      case 'wentylacja':
+      case "wentylacja":
         return wentylOptions;
       default:
         return [];
     }
   };
 
-  // Funkcja obsługująca pomijanie pytań
-  const skipQuestion = (question, options) => {
-    setTempSkippedQuestions((prev) => [
-      ...prev,
-      { step: 5, question, options },
-    ]);
-
-    // Zablokuj odpowiedni przycisk "Pomiń"
-    setSkipButtonsDisabled((prev) => ({
-      ...prev,
-      [question]: true,
-    }));
+  const skipQuestion = (question) => {
+    if (!tempSkippedQuestions.some((item) => item.question === question)) {
+      setTempSkippedQuestions((prev) => [
+        ...prev,
+        { step: 5, question, options: getOptionsForQuestion(question) },
+      ]);
+    }
   };
 
-  // Funkcja obsługująca przejście do następnego kroku
   const handleNextStep = () => {
-    // Zatwierdź dane i zaktualizuj formData
     setData((prevData) => ({
       ...prevData,
       ...tempData,
     }));
 
-    // Zaktualizuj listę pominiętych pytań na podstawie tempSkippedQuestions
     setSkippedQuestions(tempSkippedQuestions);
 
-    // Zapisz dane do localStorage
-    localStorage.setItem('step5FormData', JSON.stringify(tempData));
+    localStorage.setItem("step5FormData", JSON.stringify(tempData));
 
     nextStep();
   };
 
   const isFormValid = () => {
-    const allFieldsFilled = Object.values(tempData).every((value) => value.trim() !== '' && value !== 'Brak informacji');
-    const allQuestionsSkipped = tempSkippedQuestions.some((skipped) => skipped.step === 5);
-    return allFieldsFilled || allQuestionsSkipped;
+    const allFieldsFilled = Object.values(tempData).every(
+      (value) => value.trim() !== ""
+    );
+
+    return allFieldsFilled;
   };
 
   return (
@@ -160,8 +151,10 @@ export default function Step5({
 
       <div className="inputs">
         {/* Ogrzewanie */}
-        <div className="input-wrapper">
-          <label className={`lato-light ${tempData.ogrzewanie ? 'active' : ''}`}>
+        {/* <div className="input-wrapper">
+          <label
+            className={`lato-light ${tempData.ogrzewanie ? "active" : ""}`}
+          >
             Wybierz rodzaj ogrzewania
           </label>
           <select
@@ -171,24 +164,30 @@ export default function Step5({
             onChange={handleChange}
             required
           >
-            <option value="" disabled>Wybierz rodzaj ogrzewania</option> {/* Tytuł komórki */}
+            <option value="" disabled>
+              Wybierz rodzaj ogrzewania
+            </option>
             {powOptions.map((option, index) => (
               <option key={index} value={option}>
                 {option}
               </option>
             ))}
           </select>
-          <button
-            onClick={() => skipQuestion('ogrzewanie', powOptions)}
-            disabled={skipButtonsDisabled.ogrzewanie}
-          >
-            Pomiń
-          </button>
-        </div>
+        </div> */}
+
+        <CustomSelect
+          label="Wybierz rodzaj ogrzewania"
+          options={powOptions}
+          name="ogrzewanie"
+          value={tempData.ogrzewanie}
+          onChange={handleChange}
+        />
 
         {/* Źródło ciepłej wody */}
-        <div className="input-wrapper">
-          <label className={`lato-light ${tempData.wodaciepla ? 'active' : ''}`}>
+        {/* <div className="input-wrapper">
+          <label
+            className={`lato-light ${tempData.wodaciepla ? "active" : ""}`}
+          >
             Wybierz źródło ciepłej wody
           </label>
           <select
@@ -198,24 +197,28 @@ export default function Step5({
             onChange={handleChange}
             required
           >
-            <option value="" disabled>Wybierz źródło ciepłej wody</option> {/* Tytuł komórki */}
+            <option value="" disabled>
+              Wybierz źródło ciepłej wody
+            </option>
             {wodaOptions.map((option, index) => (
               <option key={index} value={option}>
                 {option}
               </option>
             ))}
           </select>
-          <button
-            onClick={() => skipQuestion('wodaciepla', wodaOptions)}
-            disabled={skipButtonsDisabled.wodaciepla}
-          >
-            Pomiń
-          </button>
-        </div>
+        </div> */}
+
+        <CustomSelect
+          label="Wybierz źródło ciepłej wody"
+          options={wodaOptions}
+          value={tempData.wodaciepla}
+          onChange={handleChange}
+          name="wodaciepla"
+        />
 
         {/* Grzejniki */}
-        <div className="input-wrapper">
-          <label className={`lato-light ${tempData.grzejniki ? 'active' : ''}`}>
+        {/* <div className="input-wrapper">
+          <label className={`lato-light ${tempData.grzejniki ? "active" : ""}`}>
             Wybierz rodzaj grzejników
           </label>
           <select
@@ -225,24 +228,29 @@ export default function Step5({
             onChange={handleChange}
             required
           >
-            <option value="" disabled>Wybierz rodzaj grzejników</option> {/* Tytuł komórki */}
+            <option value="" disabled>
+              Wybierz rodzaj grzejników
+            </option>
             {grzejnikOptions.map((option, index) => (
               <option key={index} value={option}>
                 {option}
               </option>
             ))}
           </select>
-          <button
-            onClick={() => skipQuestion('grzejniki', grzejnikOptions)}
-            disabled={skipButtonsDisabled.grzejniki}
-          >
-            Pomiń
-          </button>
-        </div>
-
+        </div> */}
+        
+        <CustomSelect
+            label="Wybierz rodzaj grzejników"
+            options={grzejnikOptions}
+            value={tempData.grzejniki}
+            onChange={handleChange}
+            name="grzejniki"
+          />
         {/* Wentylacja */}
-        <div className="input-wrapper">
-          <label className={`lato-light ${tempData.wentylacja ? 'active' : ''}`}>
+        {/* <div className="input-wrapper">
+          <label
+            className={`lato-light ${tempData.wentylacja ? "active" : ""}`}
+          >
             Wybierz rodzaj wentylacji
           </label>
           <select
@@ -252,20 +260,24 @@ export default function Step5({
             onChange={handleChange}
             required
           >
-            <option value="" disabled>Wybierz rodzaj wentylacji</option> {/* Tytuł komórki */}
+            <option value="" disabled>
+              Wybierz rodzaj wentylacji
+            </option>
             {wentylOptions.map((option, index) => (
               <option key={index} value={option}>
                 {option}
               </option>
             ))}
           </select>
-          <button
-            onClick={() => skipQuestion('wentylacja', wentylOptions)}
-            disabled={skipButtonsDisabled.wentylacja}
-          >
-            Pomiń
-          </button>
-        </div>
+        </div> */}
+        
+        <CustomSelect
+            label="Wybierz rodzaj wentylacji"
+            options={wentylOptions}
+            value={tempData.wentylacja}
+            onChange={handleChange}
+            name="wentylacja"
+          />
 
         {/* Liczba szyb */}
         <div className="input-wrapper">
@@ -277,15 +289,9 @@ export default function Step5({
             onChange={handleChange}
             required
           />
-          <label className={`lato-light ${tempData.szyby ? 'active' : ''}`}>
-            Liczba szyb w oknach [szt]
+          <label className={`lato-light ${tempData.szyby ? "active" : ""}`}>
+            Liczba szyb w oknach [szt] --(wpisz 0 jeśli brak danych)
           </label>
-          <button
-            onClick={() => skipQuestion('szyby')}
-            disabled={skipButtonsDisabled.szyby}
-          >
-            Pomiń
-          </button>
         </div>
       </div>
 

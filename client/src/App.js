@@ -11,6 +11,7 @@ import HomePage from '../src/pages/homePage/HomePage';
 import RegisterPage from '../src/pages/registerPage/RegisterPage';
 import LoginPage from '../src/pages/loginPage/LoginPage';
 import FormPage from '../src/pages/formPage/FormPage'
+import ChatPage from './pages/chatPage/ChatPage';
 
 const Layout = () => {
   return (
@@ -46,6 +47,10 @@ const router = createBrowserRouter([
     path: "/form",
     element: <FormPage />
     // element: <AppComponent />
+  },
+  {
+    path: "/chat",
+    element: <ChatPage />
   },
   
 
