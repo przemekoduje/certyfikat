@@ -541,9 +541,6 @@ export default function ChatPage() {
     }
   }, [skippedQuestions]);
 
-  console.log(currentQuestionIndex);
-  console.log(formData.length);
-
   const generatePDF = async (skippedQuestions) => {
     const doc = new jsPDF();
 
@@ -666,6 +663,65 @@ export default function ChatPage() {
       ...prevFiles,
       [fieldName]: file,
     }));
+    console.log("Wybrano plik:", file);
+  };
+
+  // Funkcja do zebrania wszystkich pytań i odpowiedzi
+  const prepareUserAnswers = () => {
+    const answers = formData.map((question) => {
+      const userAnswer = userInputs[question.inputs?.[0]?.fieldName || "singleInput"];
+      
+      return {
+        question: question.question,  // Pytanie z formData
+        answer: userAnswer || "Brak odpowiedzi"  // Prawdziwa odpowiedź użytkownika
+      };
+    });
+  
+    console.log("Otrzymano dane użytkownika:", answers);
+    return answers;
+  };
+
+  
+
+  const sendDataToBackend = async () => {
+    const userAnswers = prepareUserAnswers();
+
+    // Tworzymy obiekt zawierający odpowiedzi użytkownika oraz załączone pliki
+    const formData = new FormData();
+
+    // Dodajemy odpowiedzi do formData jako JSON
+    formData.append("userAnswers", JSON.stringify(userAnswers));
+
+    // Dodajemy załączone pliki do formData
+    if (uploadedFiles.exteriorPhoto) {
+      formData.append("exteriorPhoto", uploadedFiles.exteriorPhoto);
+    }
+    if (uploadedFiles.propertyLayout) {
+      formData.append("propertyLayout", uploadedFiles.propertyLayout);
+    }
+    if (uploadedFiles.additionalPhoto) {
+      formData.append("additionalPhoto", uploadedFiles.additionalPhoto);
+    }
+
+    try {
+      // Wysyłamy dane na backend
+      const response = await fetch("http://localhost:3001/api/send-form-data", {
+        method: "POST",
+        body: formData,
+      });
+
+      // Sprawdzamy odpowiedź z backendu
+      if (response.ok) {
+        const result = await response.json(); // Odczytanie odpowiedzi jako JSON
+        alert(result.message || "Dane zostały pomyślnie wysłane!");
+      } else {
+        const errorData = await response.json(); // Odczytanie danych błędu
+        alert(errorData.message || "Błąd podczas wysyłania danych.");
+      }
+    } catch (error) {
+      console.error("Błąd wysyłania danych:", error);
+      alert("Wystąpił błąd podczas wysyłania danych.");
+    }
   };
 
   return (
@@ -850,7 +906,9 @@ export default function ChatPage() {
 
                       {/* Przycisk Wyslij - funkcjonalność dodamy w następnym etapie */}
                       <p></p>
-                      <button className="send">Wyślij</button>
+                      <button className="send" onClick={sendDataToBackend}>
+                        Wyślij
+                      </button>
                     </div>
                   </>
                 ))}
