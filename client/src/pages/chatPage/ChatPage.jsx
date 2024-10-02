@@ -265,6 +265,7 @@ export default function ChatPage() {
   }, [currentQuestionIndex, chatVisible]);
 
   const handleInputChange = (e, fieldName) => {
+    console.log("Field name:", fieldName, "Value:", e.target.value);
     setUserInputs((prevInputs) => ({
       ...prevInputs,
       [fieldName]: e.target.value,
@@ -282,6 +283,8 @@ export default function ChatPage() {
 
   const handleInputSubmit = (event) => {
     if (event.key === "Enter") {
+
+      console.log("Przed zapisem userInputs:", userInputs);
       const currentQuestion = formData[currentQuestionIndex];
 
       const userResponse = {
@@ -667,55 +670,76 @@ export default function ChatPage() {
   };
 
   // Funkcja do zebrania wszystkich pytań i odpowiedzi
-  const prepareUserAnswers = () => {
-    const answers = formData.map((question) => {
-      const userAnswer = userInputs[question.inputs?.[0]?.fieldName || "singleInput"];
+  const prepareConversationData = () => {
+    // Tworzymy pustą tablicę, która przechowa wszystkie pytania i odpowiedzi
+    let conversationData = [];
+    
+    // Przechodzimy przez conversation
+    for (let i = 0; i < conversation.length; i++) {
+      const message = conversation[i];
       
-      return {
-        question: question.question,  // Pytanie z formData
-        answer: userAnswer || "Brak odpowiedzi"  // Prawdziwa odpowiedź użytkownika
-      };
-    });
+      // Jeśli wiadomość pochodzi od bota (pytanie)
+      if (message.type === "bot") {
+        // Znajdujemy kolejną wiadomość od użytkownika, która jest odpowiedzią na to pytanie
+        const userResponse = conversation[i + 1] && conversation[i + 1].type === "user"
+          ? conversation[i + 1].text
+          : "Brak odpowiedzi";
   
-    console.log("Otrzymano dane użytkownika:", answers);
-    return answers;
+        // Dodajemy parę pytanie-odpowiedź do tablicy conversationData
+        conversationData.push({
+          question: message.text, // Pytanie bota
+          answer: userResponse // Odpowiedź użytkownika
+        });
+      }
+    }
+  
+    console.log("Otrzymano dane rozmowy:", conversationData);
+    return conversationData;
   };
-
   
 
-  const sendDataToBackend = async () => {
-    const userAnswers = prepareUserAnswers();
+  console.log(conversation)
+  console.log(userInputs)
 
-    // Tworzymy obiekt zawierający odpowiedzi użytkownika oraz załączone pliki
+
+
+  const sendConversationToBackend = async () => {
+    const conversationData = prepareConversationData();
     const formData = new FormData();
-
-    // Dodajemy odpowiedzi do formData jako JSON
-    formData.append("userAnswers", JSON.stringify(userAnswers));
-
-    // Dodajemy załączone pliki do formData
+  
+    formData.append("userAnswers", JSON.stringify(conversationData));
+  
     if (uploadedFiles.exteriorPhoto) {
+      console.log("Wybrany plik exteriorPhoto:", uploadedFiles.exteriorPhoto);
       formData.append("exteriorPhoto", uploadedFiles.exteriorPhoto);
     }
+  
     if (uploadedFiles.propertyLayout) {
+      console.log("Wybrany plik propertyLayout:", uploadedFiles.propertyLayout);
       formData.append("propertyLayout", uploadedFiles.propertyLayout);
     }
+  
     if (uploadedFiles.additionalPhoto) {
+      console.log("Wybrany plik additionalPhoto:", uploadedFiles.additionalPhoto);
       formData.append("additionalPhoto", uploadedFiles.additionalPhoto);
     }
 
+    // Zalogowanie zawartości FormData przed wysłaniem
+  for (let pair of formData.entries()) {
+    console.log(pair[0], pair[1]);
+  }
+  
     try {
-      // Wysyłamy dane na backend
       const response = await fetch("http://localhost:3001/api/send-form-data", {
         method: "POST",
         body: formData,
       });
-
-      // Sprawdzamy odpowiedź z backendu
+  
       if (response.ok) {
-        const result = await response.json(); // Odczytanie odpowiedzi jako JSON
+        const result = await response.json();
         alert(result.message || "Dane zostały pomyślnie wysłane!");
       } else {
-        const errorData = await response.json(); // Odczytanie danych błędu
+        const errorData = await response.json();
         alert(errorData.message || "Błąd podczas wysyłania danych.");
       }
     } catch (error) {
@@ -723,6 +747,9 @@ export default function ChatPage() {
       alert("Wystąpił błąd podczas wysyłania danych.");
     }
   };
+  
+
+  
 
   return (
     <div className="chatpage">
@@ -906,7 +933,7 @@ export default function ChatPage() {
 
                       {/* Przycisk Wyslij - funkcjonalność dodamy w następnym etapie */}
                       <p></p>
-                      <button className="send" onClick={sendDataToBackend}>
+                      <button className="send" onClick={sendConversationToBackend}>
                         Wyślij
                       </button>
                     </div>
