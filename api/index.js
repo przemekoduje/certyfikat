@@ -42,20 +42,37 @@ const storage = multer.diskStorage({
   },
 });
 
-const upload = multer({ storage });
+const upload = multer({
+  storage,
+  limits: { fileSize: 10 * 1024 * 1024 } // 10 MB limit na plik
+});
 
-// Nowy endpoint do odbierania danych z formularza i plików
 app.post('/api/send-form-data', upload.fields([
   { name: 'exteriorPhoto', maxCount: 1 },
   { name: 'propertyLayout', maxCount: 1 },
   { name: 'additionalPhoto', maxCount: 1 }
 ]), (req, res) => {
-  const { userAnswers } = req.body; // Dane formularza
+
+  console.log('req.body:', req.body);  // Sprawdzenie danych JSON
+  console.log('req.files:', req.files);  // Sprawdzenie plików
+  // Sparsuj dane z JSON
+  let userAnswers;
+  try {
+    userAnswers = JSON.parse(req.body.userAnswers); // Parsowanie JSON-a
+  } catch (error) {
+    return res.status(400).json({ message: 'Invalid form data' });
+  }
+
   const uploadedFiles = req.files; // Pliki załączone przez użytkownika
 
   if (!userAnswers || Object.keys(userAnswers).length === 0) {
     return res.status(400).json({ message: 'No form data provided' });
   }
+
+  // if (!req.files || Object.keys(req.files).length === 0) {
+  //   return res.status(400).json({ message: 'No files uploaded' });
+  // }
+  
 
   console.log("Otrzymano dane użytkownika:", userAnswers);
   console.log("Otrzymano pliki:", uploadedFiles);
@@ -67,6 +84,7 @@ app.post('/api/send-form-data', upload.fields([
     files: uploadedFiles
   });
 });
+
 
 
 
