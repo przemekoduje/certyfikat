@@ -1,15 +1,20 @@
 import express from 'express';
 import path from 'path';
 import nodemailer from 'nodemailer';
-import { fileURLToPath } from 'url';
+import { fileURLToPath } from 'url'; // Importujemy z `url`, aby utworzyć `__dirname`
 import dotenv from 'dotenv';
 import cors from 'cors';
 import multer from 'multer';
+import fs from 'fs';
 
 // Ładowanie zmiennych środowiskowych
 dotenv.config();
 
 const app = express();
+
+// Definiowanie `__dirname` w module ESM
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Middleware do obsługi danych w formacie JSON
 app.use(express.json());
@@ -17,23 +22,55 @@ app.use(express.json());
 // Middleware CORS
 app.use(cors());
 
-// Konfiguracja ścieżki do plików statycznych (np. PDF)
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+// Serwowanie plików statycznych
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Upewnij się, że folder do zapisu PDF istnieje
+const pdfDirectory = path.join(__dirname, 'public', 'pdf');
+if (!fs.existsSync(pdfDirectory)) {
+  fs.mkdirSync(pdfDirectory, { recursive: true });
+}
 
 // Ustawienia Multer - miejsce, gdzie będą zapisywane pliki
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    const pdfDirectory = path.join(__dirname, 'public', 'pdf');
     cb(null, pdfDirectory); // Ścieżka, gdzie mają być zapisywane pliki
   },
   filename: (req, file, cb) => {
-    // Stała nazwa pliku: 'pytania.pdf'
-    cb(null, 'pytania.pdf');
+    // Stała nazwa pliku: 'pytaniaChat.pdf'
+    cb(null, 'pytaniaChat.pdf');
   },
 });
 
 const upload = multer({ storage });
+
+// Nowy endpoint do odbierania danych z formularza i plików
+app.post('/api/send-form-data', upload.fields([
+  { name: 'exteriorPhoto', maxCount: 1 },
+  { name: 'propertyLayout', maxCount: 1 },
+  { name: 'additionalPhoto', maxCount: 1 }
+]), (req, res) => {
+  const { userAnswers } = req.body; // Dane formularza
+  const uploadedFiles = req.files; // Pliki załączone przez użytkownika
+
+  if (!userAnswers || Object.keys(userAnswers).length === 0) {
+    return res.status(400).json({ message: 'No form data provided' });
+  }
+
+  console.log("Otrzymano dane użytkownika:", userAnswers);
+  console.log("Otrzymano pliki:", uploadedFiles);
+
+  // Przykładowa logika - np. zapis danych do pliku lub bazy danych
+
+  res.status(200).json({
+    message: 'Dane i pliki zostały pomyślnie przesłane!',
+    files: uploadedFiles
+  });
+});
+
+
+
+
 
 // Endpoint do przesyłania pliku PDF
 app.post('/api/upload-pdf', upload.single('pdf'), (req, res) => {
@@ -43,7 +80,7 @@ app.post('/api/upload-pdf', upload.single('pdf'), (req, res) => {
 
   res.status(200).json({
     message: 'File uploaded successfully',
-    filePath: '/public/pdf/pytania.pdf',
+    filePath: '/public/pdf/pytaniaChat.pdf',
   });
 });
 
@@ -72,8 +109,8 @@ app.post('/api/send-email', async (req, res) => {
     replyTo: from,
     attachments: [
       {
-        filename: 'pytania.pdf', // Plik będzie miał nazwę 'pytania.pdf'
-        path: path.join(__dirname, 'public', 'pdf', 'pytania.pdf'),
+        filename: 'pytaniaChat.pdf', // Plik będzie miał nazwę 'pytaniaChat.pdf'
+        path: path.join(__dirname, 'public', 'pdf', 'pytaniaChat.pdf'),
       },
     ],
   };
